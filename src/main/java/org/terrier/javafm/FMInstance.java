@@ -4,6 +4,10 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import java.util.stream.DoubleStream;
 
+/**
+ *
+ * @author Saúl Vargas (Saul.Vargas@glasgow.ac.uk)
+ */
 public class FMInstance {
 
     private final double target;
