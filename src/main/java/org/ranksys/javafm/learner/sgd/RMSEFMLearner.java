@@ -11,9 +11,9 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import java.util.function.IntToDoubleFunction;
-import org.ranksys.javafm.FMData;
+import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.FM;
-import org.ranksys.javafm.FMInstance;
+import org.ranksys.javafm.instance.FMInstance;
 
 /**
  *

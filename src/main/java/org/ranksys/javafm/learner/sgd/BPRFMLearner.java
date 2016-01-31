@@ -12,9 +12,9 @@ import cern.colt.matrix.DoubleMatrix2D;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import java.util.function.IntToDoubleFunction;
-import org.ranksys.javafm.FMData;
+import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.FM;
-import org.ranksys.javafm.PairedFMInstance;
+import org.ranksys.javafm.instance.PairedFMInstance;
 
 /**
  *

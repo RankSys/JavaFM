@@ -17,9 +17,9 @@ import static java.lang.Math.log;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.IntToDoubleFunction;
-import org.ranksys.javafm.FMData;
+import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.FM;
-import org.ranksys.javafm.NormFMInstance;
+import org.ranksys.javafm.instance.NormFMInstance;
 
 /**
  *

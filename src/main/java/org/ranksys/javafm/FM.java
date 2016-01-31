@@ -7,6 +7,7 @@
  */
 package org.ranksys.javafm;
 
+import org.ranksys.javafm.instance.FMInstance;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
@@ -67,7 +68,7 @@ public class FM<I extends FMInstance> {
             xm.assign(mi, (r, s) -> r + xi * s);
 
             return xi * wi - 0.5 * xi * xi * mi.zDotProduct(mi);
-        }, (a, b) -> a + b);
+        }, (v1, v2) -> v1 + v2);
 
         pred += 0.5 * xm.zDotProduct(xm);
 
@@ -95,7 +96,7 @@ public class FM<I extends FMInstance> {
             DoubleMatrix1D mj = m.viewRow(j);
 
             return xi * xj * mi.zDotProduct(mj);
-        }, (a, b) -> a + b);
+        }, (v1, v2) -> v1 + v2);
 
         return pred;
     }
