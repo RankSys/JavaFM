@@ -8,8 +8,8 @@
 package org.ranksys.javafm.learner.sgd;
 
 import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import static java.lang.Math.exp;
@@ -104,8 +104,8 @@ public class ListRankFMLearner extends SGDFMLearner<NormFMInstance> {
 
     @Override
     protected void gradientDescent(FM<NormFMInstance> fm, double alpha, NormFMInstance x, FMData<NormFMInstance> train) {
-        DenseDoubleMatrix1D w = fm.getW();
-        DenseDoubleMatrix2D m = fm.getM();
+        DoubleMatrix1D w = fm.getW();
+        DoubleMatrix2D m = fm.getM();
 
         int norm = x.getNorm();
 

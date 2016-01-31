@@ -8,8 +8,8 @@
 package org.ranksys.javafm.learner.sgd;
 
 import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import java.util.function.IntToDoubleFunction;
 import org.ranksys.javafm.FMData;
 import org.ranksys.javafm.FM;
@@ -44,8 +44,8 @@ public class RMSEFMLearner extends SGDFMLearner<FMInstance> {
 
     @Override
     protected void gradientDescent(FM<FMInstance> fm, double alpha, FMInstance x, FMData<FMInstance> train) {
-        DenseDoubleMatrix1D w = fm.getW();
-        DenseDoubleMatrix2D m = fm.getM();
+        DoubleMatrix1D w = fm.getW();
+        DoubleMatrix2D m = fm.getM();
 
         double err = fm.prediction(x) - x.getTarget();
 

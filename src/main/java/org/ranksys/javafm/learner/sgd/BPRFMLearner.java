@@ -8,8 +8,7 @@
 package org.ranksys.javafm.learner.sgd;
 
 import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import cern.colt.matrix.DoubleMatrix2D;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import java.util.function.IntToDoubleFunction;
@@ -51,8 +50,8 @@ public class BPRFMLearner extends SGDFMLearner<PairedFMInstance> {
 
     @Override
     protected void gradientDescent(FM<PairedFMInstance> fm, double alpha, PairedFMInstance x, FMData<PairedFMInstance> train) {
-        DenseDoubleMatrix1D w = fm.getW();
-        DenseDoubleMatrix2D m = fm.getM();
+        DoubleMatrix1D w = fm.getW();
+        DoubleMatrix2D m = fm.getM();
 
         int p = x.getP();
         double xp = x.getXp();

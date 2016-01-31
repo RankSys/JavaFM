@@ -10,19 +10,49 @@ package org.ranksys.javafm;
 import java.util.stream.Stream;
 
 /**
+ * Collection of instances.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
+ * @param <I> type of instances
  */
 public interface FMData<I extends FMInstance> {
     
+    /**
+     * Returns number of instances.
+     *
+     * @return number of instances
+     */
     public int numInstances();
     
+    /**
+     * Returns Number of features of the instances.
+     *
+     * @return number of features
+     */
     public int numFeatures();
     
+    /**
+     * Returns a stream of all instances.
+     *
+     * @return stream of all instances
+     */
     public Stream<I> stream();
     
+    /**
+     * Returns a stream of instances having non-zero values for the index of
+     * a feature.
+     *
+     * @param i index of the feature.
+     * @return stream of instances
+     */
     public Stream<I> stream(int i);
     
+    /**
+     * Returns a sample of instances of size n
+     *
+     * @param n sample size
+     * @return stream of instances
+     */
     public Stream<I> sample(int n);
     
 }
