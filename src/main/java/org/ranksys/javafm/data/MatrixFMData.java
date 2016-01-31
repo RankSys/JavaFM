@@ -34,23 +34,16 @@ public class MatrixFMData implements FMData<FMInstance> {
      * Constructor.
      *
      * @param targets target vector
-     * @param matrix feature matrix
+     * @param features feature matrix
      */
-    public MatrixFMData(DenseDoubleMatrix1D targets, SparseDoubleMatrix2D matrix) {
-        this(targets, matrix, new Random());
+    public MatrixFMData(DenseDoubleMatrix1D targets, SparseDoubleMatrix2D features, Random rnd) {
+        this.targets = targets;
+        this.features = features;
+        this.rnd = rnd;
     }
 
-    /**
-     * Constructor.
-     *
-     * @param targets target vector
-     * @param matrix feature matrix
-     * @param rnd random number generator for sampling
-     */
-    public MatrixFMData(DenseDoubleMatrix1D targets, SparseDoubleMatrix2D matrix, Random rnd) {
-        this.targets = targets;
-        this.features = matrix;
-        this.rnd = rnd;
+    public MatrixFMData(DenseDoubleMatrix1D targets, SparseDoubleMatrix2D features) {
+        this(targets, features, new Random());
     }
 
     @Override
@@ -82,9 +75,14 @@ public class MatrixFMData implements FMData<FMInstance> {
     }
 
     @Override
-    public Stream<FMInstance> sample(int n) {
+    public Stream<FMInstance> sample(int n, Random rnd) {
         return rnd.ints(n, 0, numInstances())
                 .mapToObj(i -> convert(targets.getQuick(i), features.viewRow(i)));
+    }
+
+    @Override
+    public Stream<FMInstance> sample(int n) {
+        return sample(n, rnd);
     }
 
     private FMInstance convert(double target, DoubleMatrix1D row) {

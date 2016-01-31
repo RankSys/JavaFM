@@ -7,6 +7,7 @@
  */
 package org.ranksys.javafm.data;
 
+import java.util.Random;
 import org.ranksys.javafm.instance.FMInstance;
 import java.util.stream.Stream;
 
@@ -55,5 +56,13 @@ public interface FMData<I extends FMInstance> {
      * @return stream of instances
      */
     public Stream<I> sample(int n);
+    
+    /**
+     * Returns a sample of instances of size n
+     *
+     * @param n sample size
+     * @return stream of instances
+     */
+    public Stream<I> sample(int n, Random rnd);
     
 }
