@@ -1,4 +1,11 @@
-package org.terrier.javafm;
+/* 
+ * Copyright (C) 2016 RankSys http://ranksys.org
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package org.ranksys.javafm;
 
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
@@ -6,7 +13,7 @@ import java.util.stream.DoubleStream;
 
 /**
  *
- * @author Saúl Vargas (Saul.Vargas@glasgow.ac.uk)
+ * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
 public class FMInstance {
 

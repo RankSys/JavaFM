@@ -1,4 +1,11 @@
-package org.terrier.javafm;
+/* 
+ * Copyright (C) 2016 RankSys http://ranksys.org
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package org.ranksys.javafm;
 
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
@@ -19,9 +26,9 @@ import java.util.zip.ZipOutputStream;
 
 /**
  *
- * @author Saúl Vargas (Saul.Vargas@glasgow.ac.uk)
+ * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
-public class FM {
+public class FM<I extends FMInstance> {
 
     private double b;
     private final DenseDoubleMatrix1D w;
@@ -33,7 +40,7 @@ public class FM {
         this.m = m;
     }
 
-    public double prediction(FMInstance x) {
+    public double prediction(I x) {
         double pred = b;
 
         DoubleMatrix1D xm = new DenseDoubleMatrix1D(m.columns());
@@ -51,7 +58,7 @@ public class FM {
         return pred;
     }
 
-    public double prediction(FMInstance x, int i, double xi) {
+    public double prediction(I x, int i, double xi) {
         double wi = w.getQuick(i);
         DoubleMatrix1D mi = m.viewRow(i);
 

@@ -1,18 +1,25 @@
-package org.terrier.javafm.learner.sgd;
+/* 
+ * Copyright (C) 2016 RankSys http://ranksys.org
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package org.ranksys.javafm.learner.sgd;
 
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import java.util.function.IntToDoubleFunction;
-import org.terrier.javafm.FMData;
-import org.terrier.javafm.FM;
-import org.terrier.javafm.FMInstance;
+import org.ranksys.javafm.FMData;
+import org.ranksys.javafm.FM;
+import org.ranksys.javafm.FMInstance;
 
 /**
  *
- * @author Saúl Vargas (Saul.Vargas@glasgow.ac.uk)
+ * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
-public class RMSEFMLearner extends SGDFMLearner {
+public class RMSEFMLearner extends SGDFMLearner<FMInstance> {
 
     private final double lambdaB;
     private final IntToDoubleFunction lambdaW;
@@ -30,13 +37,13 @@ public class RMSEFMLearner extends SGDFMLearner {
     }
 
     @Override
-    protected double localError(FM fm, FMInstance x, FMData test) {
+    protected double localError(FM<FMInstance> fm, FMInstance x, FMData<FMInstance> test) {
         double e = fm.prediction(x) - x.getTarget();
         return e * e;
     }
 
     @Override
-    protected void gradientDescent(FM fm, double alpha, FMInstance x, FMData train) {
+    protected void gradientDescent(FM<FMInstance> fm, double alpha, FMInstance x, FMData<FMInstance> train) {
         DenseDoubleMatrix1D w = fm.getW();
         DenseDoubleMatrix2D m = fm.getM();
 

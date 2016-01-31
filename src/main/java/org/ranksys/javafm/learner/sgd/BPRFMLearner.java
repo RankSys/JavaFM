@@ -1,4 +1,11 @@
-package org.terrier.javafm.learner.sgd;
+/* 
+ * Copyright (C) 2016 RankSys http://ranksys.org
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package org.ranksys.javafm.learner.sgd;
 
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
@@ -6,16 +13,15 @@ import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import java.util.function.IntToDoubleFunction;
-import org.terrier.javafm.FMData;
-import org.terrier.javafm.FM;
-import org.terrier.javafm.FMInstance;
-import org.terrier.javafm.PairedFMInstance;
+import org.ranksys.javafm.FMData;
+import org.ranksys.javafm.FM;
+import org.ranksys.javafm.PairedFMInstance;
 
 /**
  *
- * @author Saúl Vargas (Saul.Vargas@glasgow.ac.uk)
+ * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
-public class BPRFMLearner extends SGDFMLearner {
+public class BPRFMLearner extends SGDFMLearner<PairedFMInstance> {
 
     private final IntToDoubleFunction lambdaW;
     private final IntToDoubleFunction lambdaM;
@@ -31,22 +37,27 @@ public class BPRFMLearner extends SGDFMLearner {
     }
 
     @Override
-    protected double localError(FM fm, FMInstance x, FMData test) {
-        double pp = fm.prediction(x, ((PairedFMInstance) x).getP(), ((PairedFMInstance) x).getXp());
-        double np = fm.prediction(x, ((PairedFMInstance) x).getN(), ((PairedFMInstance) x).getXn());
+    protected double localError(FM<PairedFMInstance> fm, PairedFMInstance x, FMData<PairedFMInstance> test) {
+        int p = x.getP();
+        double xp = x.getXp();
+        int n = x.getN();
+        double xn = x.getXn();
+        
+        double pp = fm.prediction(x, p, xp);
+        double np = fm.prediction(x, n, xn);
 
         return log(1 / (1 + exp(-(pp - np))));
     }
 
     @Override
-    protected void gradientDescent(FM fm, double alpha, FMInstance x, FMData train) {
+    protected void gradientDescent(FM<PairedFMInstance> fm, double alpha, PairedFMInstance x, FMData<PairedFMInstance> train) {
         DenseDoubleMatrix1D w = fm.getW();
         DenseDoubleMatrix2D m = fm.getM();
 
-        int p = ((PairedFMInstance) x).getP();
-        double xp = ((PairedFMInstance) x).getXp();
-        int n = ((PairedFMInstance) x).getN();
-        double xn = ((PairedFMInstance) x).getXn();
+        int p = x.getP();
+        double xp = x.getXp();
+        int n = x.getN();
+        double xn = x.getXn();
 
         double pp = fm.prediction(x, p, xp);
         double np = fm.prediction(x, n, xn);
