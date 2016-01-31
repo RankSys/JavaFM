@@ -16,6 +16,8 @@ import org.ranksys.javafm.FM;
 import org.ranksys.javafm.instance.FMInstance;
 
 /**
+ * SGD learner that minimises the RMSE of the prediction with respect to
+ * the target.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
@@ -25,10 +27,26 @@ public class RMSEFMLearner extends SGDFMLearner<FMInstance> {
     private final IntToDoubleFunction lambdaW;
     private final IntToDoubleFunction lambdaM;
 
+    /**
+     * Constructor.
+     *
+     * @param alpha learning rate
+     * @param sampleFactor proportion of training instance to be used for learning
+     * @param lambda regularisation parameter
+     */
     public RMSEFMLearner(double alpha, double sampleFactor, double lambda) {
         this(alpha, sampleFactor, lambda, i -> lambda, i -> lambda);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param alpha learning rate
+     * @param sampleFactor proportion of training instance to be used for learning
+     * @param lambdaB regularisation parameter for the global bias
+     * @param lambdaW regularisation parameters for the feature weights vector
+     * @param lambdaM regularisation parameters for the feature interactions matrix
+     */
     public RMSEFMLearner(double alpha, double sampleFactor, double lambdaB, IntToDoubleFunction lambdaW, IntToDoubleFunction lambdaM) {
         super(alpha, sampleFactor);
         this.lambdaB = lambdaB;

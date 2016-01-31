@@ -19,8 +19,10 @@ import org.ranksys.javafm.instance.FMInstance;
 import org.ranksys.javafm.learner.FMLearner;
 
 /**
+ * Stochastic gradient descent learner.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
+ * @param <I> type of instances
  */
 public abstract class SGDFMLearner<I extends FMInstance> implements FMLearner<I> {
 
@@ -30,6 +32,12 @@ public abstract class SGDFMLearner<I extends FMInstance> implements FMLearner<I>
     private final double alpha;
     private final double sampleFactor;
 
+    /**
+     * Constructor.
+     *
+     * @param alpha learning rate
+     * @param sampleFactor proportion of training instance to be used for learning
+     */
     public SGDFMLearner(double alpha, double sampleFactor) {
         this.alpha = alpha;
         this.sampleFactor = sampleFactor;
@@ -53,7 +61,7 @@ public abstract class SGDFMLearner<I extends FMInstance> implements FMLearner<I>
         DoubleFunction init = x -> sqrt(1.0 / K) * Math.random();
         m.assign(init);
 
-        FM<I> fm = new FM(b, w, m);
+        FM<I> fm = new FM<>(b, w, m);
         learn(fm, train, test);
 
         return fm;
@@ -80,7 +88,23 @@ public abstract class SGDFMLearner<I extends FMInstance> implements FMLearner<I>
 
     }
 
+    /**
+     * Local prediction error of an instance.
+     *
+     * @param fm factorisation machine
+     * @param x instance
+     * @param test test set
+     * @return local prediction error
+     */
     protected abstract double localError(FM<I> fm, I x, FMData<I> test);
 
+    /**
+     * Performs a gradient descent based on a training instance.
+     *
+     * @param fm factorisation machine
+     * @param alpha learning rate
+     * @param x instance
+     * @param train training set
+     */
     protected abstract void gradientDescent(FM<I> fm, double alpha, I x, FMData<I> train);
 }

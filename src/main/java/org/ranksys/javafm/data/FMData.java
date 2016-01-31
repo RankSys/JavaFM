@@ -61,6 +61,7 @@ public interface FMData<I extends FMInstance> {
      * Returns a sample of instances of size n
      *
      * @param n sample size
+     * @param rnd random number generator
      * @return stream of instances
      */
     public Stream<I> sample(int n, Random rnd);

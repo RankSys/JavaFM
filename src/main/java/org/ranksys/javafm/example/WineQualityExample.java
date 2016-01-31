@@ -11,21 +11,19 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import static java.lang.Double.parseDouble;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.IntToDoubleFunction;
-import static java.util.stream.Collectors.groupingBy;
 import org.ranksys.javafm.FM;
 import org.ranksys.javafm.data.ArrayListFMData;
 import org.ranksys.javafm.data.FMData;
@@ -33,25 +31,34 @@ import org.ranksys.javafm.data.MatrixFMData;
 import org.ranksys.javafm.instance.FMInstance;
 import org.ranksys.javafm.learner.FMLearner;
 import org.ranksys.javafm.learner.sgd.RMSEFMLearner;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import static java.util.stream.Collectors.groupingBy;
 
 /**
+ * Regression example with the Wine Quality dataset.<br>
+ * 
+ * https://archive.ics.uci.edu/ml/datasets/Wine+Quality
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
-public class RegressionExample {
+public class WineQualityExample {
 
     public static void main(String[] args) throws Exception {
         FMData<FMInstance> dataset = getWineQualityDataset();
-        List<FMData<FMInstance>> partition = getRandomTrainAndTestPartition(dataset, 0.6, new Random(1L));
+        List<FMData<FMInstance>> partition = getRandomPartition(dataset, 0.6, new Random(1L));
         FMData<FMInstance> train = partition.get(0);
         FMData<FMInstance> test = partition.get(1);
 
         double alpha = 0.01;
         double sample = 1.0;
         double lambdaB = 0.1;
-        IntToDoubleFunction lambdaW = i -> 0.1;
+        IntToDoubleFunction lambdaW = i -> 10.0;
         IntToDoubleFunction lambdaM = i -> 0.1;
-        int K = 0;
+        int K = 10;
 
         FMLearner<FMInstance> learner = new RMSEFMLearner(alpha, sample, lambdaB, lambdaW, lambdaM);
 
@@ -69,9 +76,15 @@ public class RegressionExample {
         DenseDoubleMatrix1D targets = new DenseDoubleMatrix1D(rows);
         SparseDoubleMatrix2D features = new SparseDoubleMatrix2D(rows, columns);
 
-        URL url = new URL("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv");
-        URLConnection yc = url.openConnection();
-        InputStream is = yc.getInputStream();
+        String filePath = "winequality-white.csv";
+        if (!new File(filePath).exists()) {
+            URL url = new URL("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv");
+            ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+            FileOutputStream fos = new FileOutputStream(filePath);
+            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        }
+
+        InputStream is = new FileInputStream(filePath);
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(is))) {
             in.readLine();
@@ -102,11 +115,11 @@ public class RegressionExample {
         return new MatrixFMData(targets, features);
     }
 
-    private static List<FMData<FMInstance>> getRandomTrainAndTestPartition(FMData<FMInstance> dataset, double trainProp, Random rnd) {
+    private static List<FMData<FMInstance>> getRandomPartition(FMData<FMInstance> dataset, double trainProp, Random rnd) {
         Map<Boolean, List<FMInstance>> partition = dataset.stream()
                 .collect(groupingBy(instance -> rnd.nextDouble() < trainProp));
-        FMData train = new ArrayListFMData(dataset.numFeatures(), partition.get(true));
-        FMData test = new ArrayListFMData(dataset.numFeatures(), partition.get(false));
+        FMData<FMInstance> train = new ArrayListFMData<>(dataset.numFeatures(), partition.get(true));
+        FMData<FMInstance> test = new ArrayListFMData<>(dataset.numFeatures(), partition.get(false));
 
         return Arrays.asList(train, test);
     }

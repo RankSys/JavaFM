@@ -17,39 +17,54 @@ import org.ranksys.javafm.instance.FMInstance;
  * Subclass of ArrayList implementing the FMData interface.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
+ * @param <I> type of instance
  */
 public class ArrayListFMData<I extends FMInstance> extends ArrayList<I> implements FMData<I> {
 
     private final int numFeatures;
     private final Random rnd;
 
+    /**
+     * Constructor.
+     *
+     * @param numFeatures number of features
+     * @param rnd random number generator
+     */
     public ArrayListFMData(int numFeatures, Random rnd) {
         this.numFeatures = numFeatures;
         this.rnd = rnd;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param numFeatures number of features
+     * @param rnd random number generator
+     * @param c collection of instances
+     */
     public ArrayListFMData(int numFeatures, Random rnd, Collection<? extends I> c) {
         super(c);
         this.numFeatures = numFeatures;
         this.rnd = rnd;
     }
 
-    public ArrayListFMData(int numFeatures, Random rnd, int initialCapacity) {
-        super(initialCapacity);
-        this.numFeatures = numFeatures;
-        this.rnd = rnd;
-    }
-
+    /**
+     * Constructor.
+     *
+     * @param numFeatures number of features
+     */
     public ArrayListFMData(int numFeatures) {
         this(numFeatures, new Random());
     }
 
+    /**
+     * Constructor.
+     *
+     * @param numFeatures number of features
+     * @param c collection of instances
+     */
     public ArrayListFMData(int numFeatures, Collection<? extends I> c) {
         this(numFeatures, new Random(), c);
-    }
-
-    public ArrayListFMData(int numFeatures, int initialCapacity) {
-        this(numFeatures, new Random(), initialCapacity);
     }
 
     @Override

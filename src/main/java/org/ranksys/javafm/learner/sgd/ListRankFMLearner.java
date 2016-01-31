@@ -22,6 +22,9 @@ import org.ranksys.javafm.FM;
 import org.ranksys.javafm.instance.NormFMInstance;
 
 /**
+ * SGD learner that learns to order the training instances having a common
+ * norm by their target. It is based on the ListRankMF algorithm by Shi et al.
+ * 2010 @RecSys.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
@@ -31,10 +34,26 @@ public class ListRankFMLearner extends SGDFMLearner<NormFMInstance> {
     private final IntToDoubleFunction lambdaW;
     private final IntToDoubleFunction lambdaM;
 
+    /**
+     * Constructor.
+     *
+     * @param alpha learning rate
+     * @param sampleFactor proportion of training instance to be used for learning
+     * @param lambda regularisation parameter
+     */
     public ListRankFMLearner(double alpha, double sampleFactor, double lambda) {
         this(alpha, sampleFactor, lambda, i -> lambda, i -> lambda);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param alpha learning rate
+     * @param sampleFactor proportion of training instance to be used for learning
+     * @param lambdaB regularisation parameter for the global bias
+     * @param lambdaW regularisation parameters for the feature weights vector
+     * @param lambdaM regularisation parameters for the feature interactions matrix
+     */
     public ListRankFMLearner(double alpha, double sampleFactor, double lambdaB, IntToDoubleFunction lambdaW, IntToDoubleFunction lambdaM) {
         super(alpha, sampleFactor);
         this.lambdaB = lambdaB;
@@ -87,7 +106,7 @@ public class ListRankFMLearner extends SGDFMLearner<NormFMInstance> {
         return norm1Map.get(train).get(norm);
     }
 
-    private static double norm2(FMData<NormFMInstance> train, FM fm, int norm) {
+    private static double norm2(FMData<NormFMInstance> train, FM<NormFMInstance> fm, int norm) {
         return train.stream(norm)
                 .mapToDouble(x2 -> exp(fm.prediction(x2)))
                 .sum();

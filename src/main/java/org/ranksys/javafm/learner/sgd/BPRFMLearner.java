@@ -17,6 +17,8 @@ import org.ranksys.javafm.FM;
 import org.ranksys.javafm.instance.PairedFMInstance;
 
 /**
+ * Pair-wise SGD learner based on the Bayesian Personalized Ranking framework
+ * by Rendle et al. 2009 (@UAI).
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
@@ -25,10 +27,25 @@ public class BPRFMLearner extends SGDFMLearner<PairedFMInstance> {
     private final IntToDoubleFunction lambdaW;
     private final IntToDoubleFunction lambdaM;
 
+    /**
+     * Constructor.
+     *
+     * @param alpha learning rate
+     * @param sampleFactor proportion of training instance to be used for learning
+     * @param lambda regularisation parameter
+     */
     public BPRFMLearner(double alpha, double sampleFactor, double lambda) {
         this(alpha, sampleFactor, i -> lambda, i -> lambda);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param alpha learning rate
+     * @param sampleFactor proportion of training instance to be used for learning
+     * @param lambdaW regularisation parameters for the feature weights vector
+     * @param lambdaM regularisation parameters for the feature interactions matrix
+     */
     public BPRFMLearner(double alpha, double sampleFactor, IntToDoubleFunction lambdaW, IntToDoubleFunction lambdaM) {
         super(alpha, sampleFactor);
         this.lambdaW = lambdaW;

@@ -35,6 +35,7 @@ public class MatrixFMData implements FMData<FMInstance> {
      *
      * @param targets target vector
      * @param features feature matrix
+     * @param rnd random number generator
      */
     public MatrixFMData(DenseDoubleMatrix1D targets, SparseDoubleMatrix2D features, Random rnd) {
         this.targets = targets;
@@ -42,6 +43,12 @@ public class MatrixFMData implements FMData<FMInstance> {
         this.rnd = rnd;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param targets target vector
+     * @param features feature matrix
+     */
     public MatrixFMData(DenseDoubleMatrix1D targets, SparseDoubleMatrix2D features) {
         this(targets, features, new Random());
     }
