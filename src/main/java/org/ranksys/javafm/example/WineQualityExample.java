@@ -30,12 +30,14 @@ import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.data.MatrixFMData;
 import org.ranksys.javafm.instance.FMInstance;
 import org.ranksys.javafm.learner.FMLearner;
-import org.ranksys.javafm.learner.sgd.RMSEFMLearner;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import org.ranksys.javafm.learner.gd.StochasticGDFMLearner;
+import org.ranksys.javafm.learner.gd.error.FMError;
+import org.ranksys.javafm.learner.gd.error.RMSEFMError;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
@@ -60,7 +62,8 @@ public class WineQualityExample {
         IntToDoubleFunction lambdaM = i -> 0.1;
         int K = 10;
 
-        FMLearner<FMInstance> learner = new RMSEFMLearner(alpha, sample, lambdaB, lambdaW, lambdaM);
+        FMError<FMInstance> error = new RMSEFMError(lambdaB, lambdaW, lambdaM);
+        FMLearner<FMInstance> learner = new StochasticGDFMLearner<>(alpha, sample, error);
 
         FM<FMInstance> fm = learner.learn(K, train, test);
 

@@ -7,6 +7,6 @@
  */
 
 /**
- * Stochastic gradient descent learners of factorisation machines.
+ * Gradient descent learners of factorisation machines.
  */
-package org.ranksys.javafm.learner.sgd;
+package org.ranksys.javafm.learner.gd;

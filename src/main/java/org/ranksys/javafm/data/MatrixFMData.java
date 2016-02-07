@@ -82,14 +82,9 @@ public class MatrixFMData implements FMData<FMInstance> {
     }
 
     @Override
-    public Stream<FMInstance> sample(int n, Random rnd) {
+    public Stream<FMInstance> sample(int n) {
         return rnd.ints(n, 0, numInstances())
                 .mapToObj(i -> convert(targets.getQuick(i), features.viewRow(i)));
-    }
-
-    @Override
-    public Stream<FMInstance> sample(int n) {
-        return sample(n, rnd);
     }
 
     private FMInstance convert(double target, DoubleMatrix1D row) {

@@ -25,8 +25,10 @@ import org.ranksys.javafm.data.ArrayListFMData;
 import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.instance.FMInstance;
 import org.ranksys.javafm.learner.FMLearner;
-import org.ranksys.javafm.learner.sgd.RMSEFMLearner;
+import org.ranksys.javafm.learner.gd.error.FMError;
+import org.ranksys.javafm.learner.gd.error.RMSEFMError;
 import static java.lang.Integer.parseInt;
+import org.ranksys.javafm.learner.gd.MiniBatchGDFMLearner;
 
 /**
  * Example with rating prediction (not real recommendation) with the MovieLens 100K
@@ -46,16 +48,20 @@ public class ML100kRatingPredictionExample {
         FMData<FMInstance> train = getRecommendationDataset("u1.base");
         FMData<FMInstance> test = getRecommendationDataset("u1.test");
 
-        double alpha = 0.01;
-        double sample = 10.0;
-        double lambdaB = 0.1;
-        IntToDoubleFunction lambdaW = i -> 0.1;
-        IntToDoubleFunction lambdaM = i -> 0.1;
+        double alpha = 0.1;
+        int numIter = 500;
+        int batchSize = 100;
+        double lambdaB = 0.01;
+        IntToDoubleFunction lambdaW = i -> 0.01;
+        IntToDoubleFunction lambdaM = i -> 0.01;
         int K = 100;
 
-        FMLearner<FMInstance> learner = new RMSEFMLearner(alpha, sample, lambdaB, lambdaW, lambdaM);
+        FMError<FMInstance> error = new RMSEFMError(lambdaB, lambdaW, lambdaM);
+        FMLearner<FMInstance> learner = new MiniBatchGDFMLearner<>(alpha, numIter, batchSize, error);
 
         FM<FMInstance> fm = learner.learn(K, train, test);
+        
+        System.out.println(learner.error(fm, test));
 
         fm.save(new FileOutputStream("fm.zip"));
     }

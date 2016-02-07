@@ -5,18 +5,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.ranksys.javafm.learner.sgd;
+package org.ranksys.javafm.learner.gd;
 
-import cern.colt.function.DoubleFunction;
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
-import static java.lang.Math.sqrt;
+import java.util.concurrent.atomic.DoubleAdder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.FM;
 import org.ranksys.javafm.instance.FMInstance;
-import org.ranksys.javafm.learner.FMLearner;
+import org.ranksys.javafm.learner.gd.error.FMError;
 
 /**
  * Stochastic gradient descent learner.
@@ -24,12 +25,11 @@ import org.ranksys.javafm.learner.FMLearner;
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  * @param <I> type of instances
  */
-public abstract class SGDFMLearner<I extends FMInstance> implements FMLearner<I> {
+public class StochasticGDFMLearner<I extends FMInstance> extends GDFMLearner<I> {
 
-    private static final Logger LOG = Logger.getLogger(SGDFMLearner.class.getName());
+    private static final Logger LOG = Logger.getLogger(StochasticGDFMLearner.class.getName());
     private static final int NSTEPS = 20;
 
-    private final double alpha;
     private final double sampleFactor;
 
     /**
@@ -37,46 +37,49 @@ public abstract class SGDFMLearner<I extends FMInstance> implements FMLearner<I>
      *
      * @param alpha learning rate
      * @param sampleFactor proportion of training instance to be used for learning
+     * @param error prediction error and gradient
      */
-    public SGDFMLearner(double alpha, double sampleFactor) {
-        this.alpha = alpha;
+    public StochasticGDFMLearner(double alpha, double sampleFactor, FMError<I> error) {
+        super(alpha, error);
         this.sampleFactor = sampleFactor;
     }
 
     @Override
     public double error(FM<I> fm, FMData<I> test) {
+        int n = (int) (sampleFactor * test.numInstances() / NSTEPS);
 
-        double err = test.sample((int) (sampleFactor * test.numInstances() / NSTEPS))
-                .mapToDouble(x -> localError(fm, x, test))
+        double err = test.sample(n)
+                .mapToDouble(x -> error.localError(fm, x, test))
                 .average().getAsDouble();
 
         return err;
     }
 
-    @Override
-    public FM<I> learn(int K, FMData<I> train, FMData<I> test) {
-        double b = 0.0;
-        DenseDoubleMatrix1D w = new DenseDoubleMatrix1D(train.numFeatures());
-        DenseDoubleMatrix2D m = new DenseDoubleMatrix2D(train.numFeatures(), K);
-        DoubleFunction init = x -> sqrt(1.0 / K) * Math.random();
-        m.assign(init);
-
-        FM<I> fm = new FM<>(b, w, m);
-        learn(fm, train, test);
-
-        return fm;
-    }
 
     @Override
     public void learn(FM<I> fm, FMData<I> train, FMData<I> test) {
         LOG.log(Level.INFO, String.format("iteration n = %3d t = %.2fs", 0, 0.0));
         LOG.log(Level.FINE, () -> String.format("iteration n = %3d e = %.6f e = %.6f", 0, error(fm, train), error(fm, test)));
 
+        int n = (int) (sampleFactor * train.numInstances() / NSTEPS);
+
+        DoubleAdder gradB = new DoubleAdder();
+        DoubleMatrix1D gradW = new DenseDoubleMatrix1D(fm.getW().size());
+        DoubleMatrix2D gradM = new DenseDoubleMatrix2D(fm.getM().rows(), fm.getM().columns());
+        
         for (int t = 1; t <= NSTEPS; t++) {
             long time0 = System.nanoTime();
 
-            train.sample((int) (sampleFactor * train.numInstances() / NSTEPS)).forEach(x -> {
-                gradientDescent(fm, alpha, x, train);
+            train.sample(n).forEach(x -> {
+                gradB.reset();
+                gradW.assign(0.0);
+                gradM.assign(0.0);
+
+                error.localGradient(gradB, gradW, gradM, fm, x, train);
+
+                fm.setB(fm.getB() - alpha * gradB.doubleValue());
+                fm.getW().assign(gradW, (r, s) -> r - alpha * s);
+                fm.getM().assign(gradM, (r, s) -> r - alpha * s);
             });
 
             int iter = t;
@@ -87,24 +90,4 @@ public abstract class SGDFMLearner<I extends FMInstance> implements FMLearner<I>
         }
 
     }
-
-    /**
-     * Local prediction error of an instance.
-     *
-     * @param fm factorisation machine
-     * @param x instance
-     * @param test test set
-     * @return local prediction error
-     */
-    protected abstract double localError(FM<I> fm, I x, FMData<I> test);
-
-    /**
-     * Performs a gradient descent based on a training instance.
-     *
-     * @param fm factorisation machine
-     * @param alpha learning rate
-     * @param x instance
-     * @param train training set
-     */
-    protected abstract void gradientDescent(FM<I> fm, double alpha, I x, FMData<I> train);
 }

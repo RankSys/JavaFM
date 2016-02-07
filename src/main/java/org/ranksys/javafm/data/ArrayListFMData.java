@@ -79,7 +79,7 @@ public class ArrayListFMData<I extends FMInstance> extends ArrayList<I> implemen
 
     @Override
     public Stream<I> stream() {
-        return ((ArrayList<I>) this).stream();
+        return parallelStream().sequential();
     }
 
     @Override
@@ -88,14 +88,9 @@ public class ArrayListFMData<I extends FMInstance> extends ArrayList<I> implemen
     }
 
     @Override
-    public Stream<I> sample(int n, Random rnd) {
+    public Stream<I> sample(int n) {
         return rnd.ints(n, 0, numInstances())
                 .mapToObj(i -> get(i));
-    }
-
-    @Override
-    public Stream<I> sample(int n) {
-        return sample(n, rnd);
     }
 
 }
