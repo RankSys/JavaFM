@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 RankSys http://ranksys.org
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,41 +7,54 @@
  */
 package org.ranksys.javafm.learner.gd;
 
+import static java.lang.Math.exp;
+import static java.lang.Math.log;
 import java.util.logging.Logger;
-import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.FM;
+import org.ranksys.javafm.data.FMData;
+import org.ranksys.javafm.instance.FMInstance;
 import org.ranksys.javafm.learner.FMLearner;
 
 /**
- * Stochastic gradient descent learner.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
- * @param <I> type of instances
  */
-public class PointWiseGradientDescent implements FMLearner<FMData> {
+public class BPR implements FMLearner<FMData> {
 
-    private static final Logger LOG = Logger.getLogger(PointWiseGradientDescent.class.getName());
+    private static final Logger LOG = Logger.getLogger(BPR.class.getName());
 
     private final double learnRate;
     private final int numIter;
-    private final PointWiseError error;
-    private final double regB;
     private final double[] regW;
     private final double[] regM;
 
-    public PointWiseGradientDescent(double learnRate, int numIter, PointWiseError error, double regB, double[] regW, double[] regM) {
+    public BPR(double learnRate, int numIter, double[] regW, double[] regM) {
         this.learnRate = learnRate;
         this.numIter = numIter;
-        this.error = error;
-        this.regB = regB;
         this.regW = regW;
         this.regM = regM;
+    }
+
+    private int[] uij(FMInstance x) {
+        int[] uij = new int[3];
+        x.consume((i, xi) -> {
+            uij[(int) xi - 1] = i;
+        });
+
+        return uij;
     }
 
     @Override
     public double error(FM fm, FMData test) {
         return test.stream()
-                .mapToDouble(x -> error.error(fm, x))
+                .mapToDouble(x -> {
+                    int[] uij = uij(x);
+                    int i = uij[1];
+                    int j = uij[2];
+
+                    double sij = fm.prediction(x, i, 1.0) - fm.prediction(x, j, 1.0);
+                    return log(1 / (1 + exp(-sij)));
+                })
                 .average().getAsDouble();
     }
 
@@ -55,30 +68,25 @@ public class PointWiseGradientDescent implements FMLearner<FMData> {
             train.shuffle();
 
             train.stream().forEach(x -> {
-                double b = fm.getB();
                 double[] w = fm.getW();
                 double[][] m = fm.getM();
 
-                double lambda = error.dError(fm, x);
+                int[] uij = uij(x);
+                int u = uij[0];
+                int i = uij[1];
+                int j = uij[2];
 
-                fm.setB(b - learnRate * (lambda + regB * b));
+                double sij = fm.prediction(x, i, 1.0) - fm.prediction(x, j, 1.0);
+                double lambda = 1 / (1 + exp(sij));
 
-                double[] xm = new double[m[0].length];
-                x.consume((i, xi) -> {
-                    for (int j = 0; j < xm.length; j++) {
-                        xm[j] += xi * m[i][j];
-                    }
+                w[i] -= learnRate * (-lambda + regW[i] * w[i]);
+                w[j] -= learnRate * (+lambda + regW[j] * w[j]);
 
-                    w[i] -= learnRate * (lambda * xi + regW[i] * w[i]);
-                });
-
-                x.consume((i, xi) -> {
-                    for (int j = 0; j < m[i].length; j++) {
-                        m[i][j] -= learnRate * (lambda * xi * xm[j]
-                                - lambda * xi * xi * m[i][j]
-                                + regM[i] * m[i][j]);
-                    }
-                });
+                for (int l = 0; l < m[u].length; l++) {
+                    m[i][l] -= learnRate * (-lambda * m[u][l] + regM[i] * m[i][l]);
+                    m[j][l] -= learnRate * (+lambda * m[u][l] + regM[j] * m[j][l]);
+                    m[u][l] -= learnRate * (-lambda * m[i][l] + lambda * m[j][l] + regM[u] * m[u][l]);
+                }
             });
 
             int iter = t;
@@ -87,6 +95,5 @@ public class PointWiseGradientDescent implements FMLearner<FMData> {
             LOG.info(String.format("iteration n = %3d t = %.2fs", iter, time1 / 1_000_000_000.0));
             LOG.fine(() -> String.format("iteration n = %3d e = %.6f e = %.6f", iter, error(fm, train), error(fm, test)));
         }
-
     }
 }

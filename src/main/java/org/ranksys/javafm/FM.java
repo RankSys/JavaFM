@@ -7,6 +7,7 @@
  */
 package org.ranksys.javafm;
 
+import java.util.Random;
 import java.util.function.DoubleBinaryOperator;
 import org.ranksys.javafm.instance.FMInstance;
 
@@ -16,7 +17,8 @@ import org.ranksys.javafm.instance.FMInstance;
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  * @param <I> type of instance
  */
-public class FM<I extends FMInstance> {
+public class FM {
+
     private static final DoubleBinaryOperator SUM = (x, y) -> x + y;
 
     private double b;
@@ -36,6 +38,17 @@ public class FM<I extends FMInstance> {
         this.m = m;
     }
 
+    public FM(int numFeatures, int K, Random rnd, double sdev) {
+        this.b = 0.0;
+        this.w = new double[numFeatures];
+        this.m = new double[numFeatures][K];
+        for (double[] mi : m) {
+            for (int j = 0; j < mi.length; j++) {
+                mi[j] = rnd.nextGaussian() * sdev;
+            }
+        }
+    }
+
     private double dotProduct(double[] x, double[] y) {
         double product = 0.0;
         for (int i = 0; i < x.length; i++) {
@@ -51,7 +64,7 @@ public class FM<I extends FMInstance> {
      * @param x instance
      * @return value of prediction
      */
-    public double prediction(I x) {
+    public double prediction(FMInstance x) {
         double pred = b;
 
         double[] xm = new double[m[0].length];
@@ -76,7 +89,7 @@ public class FM<I extends FMInstance> {
      * @param xi value of the feature of interest
      * @return value of the contribution of the feature to the prediction
      */
-    public double prediction(I x, int i, double xi) {
+    public double prediction(FMInstance x, int i, double xi) {
         return 0.0
                 + xi * w[i]
                 + x.operate((j, xj) -> xi * xj * dotProduct(m[i], m[j]), SUM);
@@ -117,124 +130,4 @@ public class FM<I extends FMInstance> {
     public double[][] getM() {
         return m;
     }
-
-//    private static void saveDenseDoubleMatrix1D(OutputStream stream, DoubleMatrix1D vector) throws IOException {
-//        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(stream));
-//        double[] v = vector.toArray();
-//        for (int j = 0; j < v.length; j++) {
-//            out.write(Double.toString(v[j]));
-//            out.newLine();
-//        }
-//        out.flush();
-//    }
-//
-//    private static void saveDenseDoubleMatrix2D(OutputStream stream, DoubleMatrix2D matrix) throws IOException {
-//        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(stream));
-//        double[][] m = matrix.toArray();
-//        for (double[] pu : m) {
-//            for (int j = 0; j < pu.length; j++) {
-//                out.write(Double.toString(pu[j]));
-//                if (j < pu.length - 1) {
-//                    out.write('\t');
-//                }
-//            }
-//            out.newLine();
-//        }
-//        out.flush();
-//    }
-//
-//    private static DoubleMatrix1D loadDenseDoubleMatrix1D(InputStream stream, int rows) throws IOException {
-//        double[] v = new double[rows];
-//
-//        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
-//        for (int i = 0; i < rows; i++) {
-//            v[i] = parseDouble(in.readLine());
-//        }
-//
-//        return new DenseDoubleMatrix1D(v);
-//    }
-//
-//    private static DoubleMatrix2D loadDenseDoubleMatrix2D(InputStream stream, int rows, int columns) throws IOException {
-//        double[][] m = new double[rows][columns];
-//
-//        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
-//        for (double[] mi : m) {
-//            String[] tokens = in.readLine().split("\t", mi.length);
-//            for (int j = 0; j < mi.length; j++) {
-//                mi[j] = parseDouble(tokens[j]);
-//            }
-//        }
-//
-//        return new DenseDoubleMatrix2D(m);
-//    }
-//
-//    /**
-//     * Save factorisation machine in a compressed, human readable file.
-//     *
-//     * @param out output
-//     * @throws IOException when I/O error
-//     */
-//    public void save(OutputStream out) throws IOException {
-//        int N = m.rows();
-//        int K = m.columns();
-//        try (ZipOutputStream zip = new ZipOutputStream(out)) {
-//            zip.putNextEntry(new ZipEntry("info"));
-//            PrintStream ps = new PrintStream(zip);
-//            ps.println(N);
-//            ps.println(K);
-//            ps.flush();
-//            zip.closeEntry();
-//
-//            zip.putNextEntry(new ZipEntry("b"));
-//            ps = new PrintStream(zip);
-//            ps.println(b);
-//            ps.flush();
-//            zip.closeEntry();
-//
-//            zip.putNextEntry(new ZipEntry("w"));
-//            saveDenseDoubleMatrix1D(zip, w);
-//            zip.closeEntry();
-//
-//            zip.putNextEntry(new ZipEntry("m"));
-//            saveDenseDoubleMatrix2D(zip, m);
-//            zip.closeEntry();
-//        }
-//    }
-//
-//    /**
-//     * Loads a factorisation machine from a compressed, human readable file.
-//     *
-//     * @param in input
-//     * @return factorisation machine
-//     * @throws IOException when I/O error
-//     */
-//    public static FM load(InputStream in) throws IOException {
-//        int N;
-//        int K;
-//        double b;
-//        DoubleMatrix1D w;
-//        DoubleMatrix2D m;
-//        try (ZipInputStream zip = new ZipInputStream(in)) {
-//            zip.getNextEntry();
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(zip));
-//            N = parseInt(reader.readLine());
-//            K = parseInt(reader.readLine());
-//            zip.closeEntry();
-//
-//            zip.getNextEntry();
-//            reader = new BufferedReader(new InputStreamReader(zip));
-//            b = parseDouble(reader.readLine());
-//            zip.closeEntry();
-//
-//            zip.getNextEntry();
-//            w = loadDenseDoubleMatrix1D(zip, N);
-//            zip.closeEntry();
-//
-//            zip.getNextEntry();
-//            m = loadDenseDoubleMatrix2D(zip, N, K);
-//            zip.closeEntry();
-//        }
-//
-//        return new FM(b, w, m);
-//    }
 }

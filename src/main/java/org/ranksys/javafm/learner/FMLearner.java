@@ -9,7 +9,6 @@ package org.ranksys.javafm.learner;
 
 import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.FM;
-import org.ranksys.javafm.instance.FMInstance;
 
 /**
  * Learner of factorisation machines.
@@ -17,26 +16,26 @@ import org.ranksys.javafm.instance.FMInstance;
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  * @param <I> type of instance
  */
-public interface FMLearner<I extends FMInstance> {
+public interface FMLearner<D extends FMData> {
+
+    public double error(FM fm, D test);
 
     /**
-     * Learns a pre-initialised factorisation machine. Reports the error on the
-     * test set.
+     * Learns a pre-initialised factorisation machine. Reports the error on the test set.
      *
      * @param fm pre-initialised factorisation machine
      * @param train train set
      * @param test test set
      */
-    public void learn(FM<I> fm, FMData<I> train, FMData<I> test);
+    public void learn(FM fm, D train, D test);
 
     /**
-     * Learns a pre-initialised factorisation machine. Reports the error on the
-     * train set.
+     * Learns a pre-initialised factorisation machine. Reports the error on the train set.
      *
      * @param fm pre-initialised factorisation machine
      * @param train train set
      */
-    public default void learn(FM<I> fm, FMData<I> train) {
+    public default void learn(FM fm, D train) {
         learn(fm, train, train);
     }
 }

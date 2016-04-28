@@ -8,7 +8,8 @@
 package org.ranksys.javafm.data;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 import org.ranksys.javafm.instance.FMInstance;
@@ -19,8 +20,9 @@ import org.ranksys.javafm.instance.FMInstance;
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  * @param <I> type of instance
  */
-public class ListFMData<I extends FMInstance> extends ArrayList<I> implements FMData<I> {
+public class ListFMData implements FMData {
 
+    private final List<FMInstance> list;
     private final int numFeatures;
     private final Random rnd;
 
@@ -30,22 +32,10 @@ public class ListFMData<I extends FMInstance> extends ArrayList<I> implements FM
      * @param numFeatures number of features
      * @param rnd random number generator
      */
-    public ListFMData(int numFeatures, Random rnd) {
+    public ListFMData(int numFeatures, Random rnd, List<FMInstance> instances) {
         this.numFeatures = numFeatures;
         this.rnd = rnd;
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param numFeatures number of features
-     * @param rnd random number generator
-     * @param c collection of instances
-     */
-    public ListFMData(int numFeatures, Random rnd, Collection<? extends I> c) {
-        super(c);
-        this.numFeatures = numFeatures;
-        this.rnd = rnd;
+        this.list = new ArrayList<>(instances);
     }
 
     /**
@@ -54,22 +44,16 @@ public class ListFMData<I extends FMInstance> extends ArrayList<I> implements FM
      * @param numFeatures number of features
      */
     public ListFMData(int numFeatures) {
-        this(numFeatures, new Random());
+        this(numFeatures, new Random(), new ArrayList<>());
     }
-
-    /**
-     * Constructor.
-     *
-     * @param numFeatures number of features
-     * @param c collection of instances
-     */
-    public ListFMData(int numFeatures, Collection<? extends I> c) {
-        this(numFeatures, new Random(), c);
+    
+    public void add(FMInstance x) {
+        list.add(x);
     }
 
     @Override
     public int numInstances() {
-        return size();
+        return list.size();
     }
 
     @Override
@@ -78,19 +62,13 @@ public class ListFMData<I extends FMInstance> extends ArrayList<I> implements FM
     }
 
     @Override
-    public Stream<I> stream() {
-        return parallelStream().sequential();
+    public void shuffle() {
+        Collections.shuffle(list, rnd);
     }
 
     @Override
-    public Stream<I> stream(int i) {
-        return stream().filter(instance -> instance.get(i) > 0);
-    }
-
-    @Override
-    public Stream<I> sample(int n) {
-        return rnd.ints(n, 0, numInstances())
-                .mapToObj(i -> get(i));
+    public Stream<? extends FMInstance> stream() {
+        return list.stream();
     }
 
 }

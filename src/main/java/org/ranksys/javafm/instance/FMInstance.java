@@ -63,6 +63,10 @@ public class FMInstance {
     public double get(int i) {
         return features.get(i);
     }
+    
+    public void set(int i, double v) {
+        features.put(i, v);
+    }
 
     /**
      * Performs a consumer action on index-value pairs of the non-zero
