@@ -19,22 +19,23 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.function.IntToDoubleFunction;
-import org.ranksys.javafm.FM;
-import org.ranksys.javafm.data.ArrayListFMData;
 import org.ranksys.javafm.data.FMData;
-import org.ranksys.javafm.instance.FMInstance;
 import org.ranksys.javafm.learner.FMLearner;
-import org.ranksys.javafm.learner.gd.error.FMError;
-import org.ranksys.javafm.learner.gd.error.RMSEFMError;
+import org.ranksys.javafm.learner.gd.error.RMSEError;
+import org.ranksys.javafm.learner.gd.PointWiseGradientDescent;
+import java.util.Random;
+import org.ranksys.javafm.BoundedFM;
 import static java.lang.Integer.parseInt;
-import org.ranksys.javafm.learner.gd.MiniBatchGDFMLearner;
+import java.util.Arrays;
+import org.ranksys.javafm.data.NormFMData;
+import org.ranksys.javafm.instance.NormFMInstance;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.parseInt;
 
 /**
- * Example with rating prediction (not real recommendation) with the MovieLens 100K
- * dataset. Note that this type of rating prediction is of little use for generating useful
- * recommendations. This is just a example of how JavaFM works.<br>
- * 
+ * Example with rating prediction (not real recommendation) with the MovieLens 100K dataset. Note that this type of rating prediction is of little use for generating useful recommendations. This is just a example of how JavaFM works.<br>
+ *
  * http://files.grouplens.org/datasets/movielens/ml-100k-README.txt
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
@@ -45,29 +46,38 @@ public class ML100kRatingPredictionExample {
     private static final int NUM_ITEMS = 1682;
 
     public static void main(String[] args) throws Exception {
-        FMData<FMInstance> train = getRecommendationDataset("u1.base");
-        FMData<FMInstance> test = getRecommendationDataset("u1.test");
+        FMData<NormFMInstance> train = getRecommendationDataset("u1.base");
+        FMData<NormFMInstance> test = getRecommendationDataset("u1.test");
 
-        double alpha = 0.1;
-        int numIter = 500;
-        int batchSize = 100;
-        double lambdaB = 0.01;
-        IntToDoubleFunction lambdaW = i -> 0.01;
-        IntToDoubleFunction lambdaM = i -> 0.01;
+        double learnRate = 0.01;
+        int numIter = 200;
+        double sdev = 0.1;
+        double lambdaB = 0.1;
+        double[] lambdaW = new double[train.numFeatures()];
+        Arrays.fill(lambdaW, 0.1);
+        double[] lambdaM = new double[train.numFeatures()];
+        Arrays.fill(lambdaM, 0.1);
         int K = 100;
 
-        FMError<FMInstance> error = new RMSEFMError(lambdaB, lambdaW, lambdaM);
-        FMLearner<FMInstance> learner = new MiniBatchGDFMLearner<>(alpha, numIter, batchSize, error);
+        FMLearner<NormFMInstance> learner = new PointWiseGradientDescent<>(learnRate, numIter,
+                new RMSEError<>(), new RMSEError<>(), lambdaB, lambdaW, lambdaM);
 
-        FM<FMInstance> fm = learner.learn(K, train, test);
-        
-        System.out.println(learner.error(fm, test));
+        double b = 0.0;
+        double[] w = new double[train.numFeatures()];
+        double[][] m = new double[train.numFeatures()][K];
+        Random rnd = new Random();
+        for (double[] mi : m) {
+            for (int j = 0; j < mi.length; j++) {
+                mi[j] = rnd.nextGaussian() * sdev;
+            }
+        }
+        BoundedFM<NormFMInstance> fm = new BoundedFM<>(b, w, m, 1.0, 5.0);
 
-        fm.save(new FileOutputStream("fm.zip"));
+        learner.learn(fm, train, test);
     }
 
-    private static FMData<FMInstance> getRecommendationDataset(String file) throws MalformedURLException, IOException {
-        ArrayListFMData<FMInstance> dataset = new ArrayListFMData<>(NUM_USERS + NUM_ITEMS);
+    public static NormFMData<NormFMInstance> getRecommendationDataset(String file) throws MalformedURLException, IOException {
+        NormFMData<NormFMInstance> dataset = new NormFMData<>(NUM_USERS + NUM_ITEMS);
 
         if (!new File(file).exists()) {
             URL url = new URL("http://files.grouplens.org/datasets/movielens/ml-100k/" + file);
@@ -85,9 +95,11 @@ public class ML100kRatingPredictionExample {
                 int i = parseInt(tokens[1]) - 1 + NUM_USERS;
                 double r = parseDouble(tokens[2]);
 
-                dataset.add(new FMInstance(r, new int[]{u, i}, new double[]{1.0, 1.0}));
+                dataset.add(new NormFMInstance(u, r, new int[]{u, i}, new double[]{1.0, 1.0}));
             });
         }
+        
+//        Collections.shuffle(dataset);
 
         return dataset;
     }

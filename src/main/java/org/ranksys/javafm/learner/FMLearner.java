@@ -20,36 +20,6 @@ import org.ranksys.javafm.instance.FMInstance;
 public interface FMLearner<I extends FMInstance> {
 
     /**
-     * Prediction error of a factorisation machine in a test set.
-     *
-     * @param fm factorisation machine
-     * @param test test set
-     * @return error
-     */
-    public double error(FM<I> fm, FMData<I> test);
-
-    /**
-     * Learns a factorisation machine. Reports the error on the test set.
-     *
-     * @param K dimension of the feature interaction matrix
-     * @param train train set
-     * @param test test set
-     * @return factorisation machine learned
-     */
-    public FM<I> learn(int K, FMData<I> train, FMData<I> test);
-
-    /**
-     * Learns a factorisation machine. Reports the error on the train set.
-     *
-     * @param K dimension of the feature interaction matrix
-     * @param train train set
-     * @return factorisation machine learned
-     */
-    public default FM<I> learn(int K, FMData<I> train) {
-        return learn(K, train, train);
-    }
-
-    /**
      * Learns a pre-initialised factorisation machine. Reports the error on the
      * test set.
      *

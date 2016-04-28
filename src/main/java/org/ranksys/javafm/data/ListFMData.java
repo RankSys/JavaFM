@@ -19,7 +19,7 @@ import org.ranksys.javafm.instance.FMInstance;
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  * @param <I> type of instance
  */
-public class ArrayListFMData<I extends FMInstance> extends ArrayList<I> implements FMData<I> {
+public class ListFMData<I extends FMInstance> extends ArrayList<I> implements FMData<I> {
 
     private final int numFeatures;
     private final Random rnd;
@@ -30,7 +30,7 @@ public class ArrayListFMData<I extends FMInstance> extends ArrayList<I> implemen
      * @param numFeatures number of features
      * @param rnd random number generator
      */
-    public ArrayListFMData(int numFeatures, Random rnd) {
+    public ListFMData(int numFeatures, Random rnd) {
         this.numFeatures = numFeatures;
         this.rnd = rnd;
     }
@@ -42,7 +42,7 @@ public class ArrayListFMData<I extends FMInstance> extends ArrayList<I> implemen
      * @param rnd random number generator
      * @param c collection of instances
      */
-    public ArrayListFMData(int numFeatures, Random rnd, Collection<? extends I> c) {
+    public ListFMData(int numFeatures, Random rnd, Collection<? extends I> c) {
         super(c);
         this.numFeatures = numFeatures;
         this.rnd = rnd;
@@ -53,7 +53,7 @@ public class ArrayListFMData<I extends FMInstance> extends ArrayList<I> implemen
      *
      * @param numFeatures number of features
      */
-    public ArrayListFMData(int numFeatures) {
+    public ListFMData(int numFeatures) {
         this(numFeatures, new Random());
     }
 
@@ -63,7 +63,7 @@ public class ArrayListFMData<I extends FMInstance> extends ArrayList<I> implemen
      * @param numFeatures number of features
      * @param c collection of instances
      */
-    public ArrayListFMData(int numFeatures, Collection<? extends I> c) {
+    public ListFMData(int numFeatures, Collection<? extends I> c) {
         this(numFeatures, new Random(), c);
     }
 

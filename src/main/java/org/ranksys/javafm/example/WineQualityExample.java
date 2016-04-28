@@ -23,9 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.function.IntToDoubleFunction;
 import org.ranksys.javafm.FM;
-import org.ranksys.javafm.data.ArrayListFMData;
+import org.ranksys.javafm.data.ListFMData;
 import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.data.MatrixFMData;
 import org.ranksys.javafm.instance.FMInstance;
@@ -33,9 +32,17 @@ import org.ranksys.javafm.learner.FMLearner;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import org.ranksys.javafm.learner.gd.StochasticGDFMLearner;
-import org.ranksys.javafm.learner.gd.error.FMError;
-import org.ranksys.javafm.learner.gd.error.RMSEFMError;
+import org.ranksys.javafm.learner.gd.error.RMSEError;
+import org.ranksys.javafm.learner.gd.PointWiseGradientDescent;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.util.stream.Collectors.groupingBy;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.util.stream.Collectors.groupingBy;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.util.stream.Collectors.groupingBy;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.stream.Collectors.groupingBy;
@@ -56,20 +63,30 @@ public class WineQualityExample {
         FMData<FMInstance> test = partition.get(1);
 
         double alpha = 0.01;
-        double sample = 1.0;
+        int numIter = 200;
+        double sdev = 1.0;
         double lambdaB = 0.1;
-        IntToDoubleFunction lambdaW = i -> 10.0;
-        IntToDoubleFunction lambdaM = i -> 0.1;
+        double[] lambdaW = new double[train.numFeatures()];
+        Arrays.fill(lambdaW, 0.1);
+        double[] lambdaM = new double[train.numFeatures()];
+        Arrays.fill(lambdaM, 0.1);
         int K = 10;
 
-        FMError<FMInstance> error = new RMSEFMError(lambdaB, lambdaW, lambdaM);
-        FMLearner<FMInstance> learner = new StochasticGDFMLearner<>(alpha, sample, error);
-
-        FM<FMInstance> fm = learner.learn(K, train, test);
-
-        System.out.println(fm.getB());
-        System.out.println(fm.getW());
-        System.out.println(fm.getM());
+        FMLearner<FMInstance> learner = new PointWiseGradientDescent<>(alpha, numIter, 
+                new RMSEError(), new RMSEError(), lambdaB, lambdaW, lambdaM);
+        
+        double b = 0.0;
+        double[] w = new double[train.numFeatures()];
+        double[][] m = new double[train.numFeatures()][K];
+        Random rnd = new Random();
+        for (double[] mi : m) {
+            for (int j = 0; j < mi.length; j++) {
+                mi[j] = rnd.nextGaussian() * sdev;
+            }
+        }
+        FM<FMInstance> fm = new FM<>(b, w, m);
+        
+        learner.learn(fm, train, test);
     }
 
     private static FMData<FMInstance> getWineQualityDataset() throws MalformedURLException, IOException {
@@ -121,8 +138,8 @@ public class WineQualityExample {
     private static List<FMData<FMInstance>> getRandomPartition(FMData<FMInstance> dataset, double trainProp, Random rnd) {
         Map<Boolean, List<FMInstance>> partition = dataset.stream()
                 .collect(groupingBy(instance -> rnd.nextDouble() < trainProp));
-        FMData<FMInstance> train = new ArrayListFMData<>(dataset.numFeatures(), partition.get(true));
-        FMData<FMInstance> test = new ArrayListFMData<>(dataset.numFeatures(), partition.get(false));
+        FMData<FMInstance> train = new ListFMData<>(dataset.numFeatures(), partition.get(true));
+        FMData<FMInstance> test = new ListFMData<>(dataset.numFeatures(), partition.get(false));
 
         return Arrays.asList(train, test);
     }
