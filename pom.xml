@@ -10,7 +10,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ranksys</groupId>
     <artifactId>JavaFM</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     
     <properties>
