@@ -16,7 +16,6 @@ import org.ranksys.javafm.learner.FMLearner;
  * Stochastic gradient descent learner.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
- * @param <I> type of instances
  */
 public class PointWiseGradientDescent implements FMLearner<FMData> {
 

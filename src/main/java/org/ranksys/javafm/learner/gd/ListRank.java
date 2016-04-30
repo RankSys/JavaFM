@@ -15,7 +15,7 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import org.ranksys.javafm.FM;
 import org.ranksys.javafm.data.GroupFMData;
-import org.ranksys.javafm.instance.FMInstance;
+import org.ranksys.javafm.FMInstance;
 import org.ranksys.javafm.learner.FMLearner;
 
 /**

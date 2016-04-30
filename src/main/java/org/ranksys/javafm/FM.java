@@ -9,13 +9,11 @@ package org.ranksys.javafm;
 
 import java.util.Random;
 import java.util.function.DoubleBinaryOperator;
-import org.ranksys.javafm.instance.FMInstance;
 
 /**
  * Factorisation machine.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
- * @param <I> type of instance
  */
 public class FM {
 

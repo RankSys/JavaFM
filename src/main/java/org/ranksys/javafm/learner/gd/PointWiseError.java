@@ -11,7 +11,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 import java.util.function.DoubleBinaryOperator;
 import org.ranksys.javafm.FM;
-import org.ranksys.javafm.instance.FMInstance;
+import org.ranksys.javafm.FMInstance;
 
 /**
  *

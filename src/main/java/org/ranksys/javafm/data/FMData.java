@@ -7,14 +7,13 @@
  */
 package org.ranksys.javafm.data;
 
-import org.ranksys.javafm.instance.FMInstance;
+import org.ranksys.javafm.FMInstance;
 import java.util.stream.Stream;
 
 /**
  * Collection of instances.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
- * @param <I> type of instances
  */
 public interface FMData {
     

@@ -14,7 +14,6 @@ import org.ranksys.javafm.FM;
  * Learner of factorisation machines.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
- * @param <I> type of instance
  */
 public interface FMLearner<D extends FMData> {
 

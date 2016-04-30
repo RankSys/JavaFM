@@ -25,7 +25,7 @@ import java.util.Arrays;
 import org.ranksys.javafm.data.GroupFMData;
 import static java.lang.Integer.parseInt;
 import java.util.Random;
-import org.ranksys.javafm.instance.FMInstance;
+import org.ranksys.javafm.FMInstance;
 import static org.ranksys.javafm.learner.gd.PointWiseError.rmse;
 
 /**

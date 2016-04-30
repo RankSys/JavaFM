@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Random;
 import org.ranksys.javafm.data.ListFMData;
 import org.ranksys.javafm.data.FMData;
-import org.ranksys.javafm.instance.FMInstance;
+import org.ranksys.javafm.FMInstance;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;

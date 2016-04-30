@@ -19,13 +19,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
-import org.ranksys.javafm.instance.FMInstance;
+import org.ranksys.javafm.FMInstance;
 
 /**
  * Subclass of ArrayList implementing the FMData interface.
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
- * @param <I> type of instance
  */
 public class GroupFMData implements FMData {
 

@@ -10,7 +10,6 @@ package org.ranksys.javafm;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import java.util.Random;
-import org.ranksys.javafm.instance.FMInstance;
 
 /**
  *

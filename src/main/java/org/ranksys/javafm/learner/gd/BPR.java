@@ -12,7 +12,7 @@ import static java.lang.Math.log;
 import java.util.logging.Logger;
 import org.ranksys.javafm.FM;
 import org.ranksys.javafm.data.FMData;
-import org.ranksys.javafm.instance.FMInstance;
+import org.ranksys.javafm.FMInstance;
 import org.ranksys.javafm.learner.FMLearner;
 
 /**
