@@ -115,7 +115,7 @@ public class WineQualityExample {
 
     private static List<FMData> getRandomPartition(FMData dataset, double trainProp, Random rnd) {
         Map<Boolean, List<FMInstance>> partition = dataset.stream()
-                .collect(groupingBy(instance -> rnd.nextDouble() < trainProp));
+                .collect(groupingBy((FMInstance instance) -> rnd.nextDouble() < trainProp));
         FMData train = new SimpleFMData(dataset.numFeatures(), new Random(), partition.get(true));
         FMData test = new SimpleFMData(dataset.numFeatures(), new Random(), partition.get(false));
 
