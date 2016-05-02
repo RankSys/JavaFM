@@ -24,6 +24,7 @@ import org.ranksys.javafm.FMInstance;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.ArrayList;
 import org.ranksys.javafm.learner.gd.PointWiseGradientDescent;
 import java.util.DoubleSummaryStatistics;
 import static java.util.stream.IntStream.range;
@@ -41,13 +42,13 @@ import static java.util.stream.Collectors.groupingBy;
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
 public class WineQualityExample {
-
+    
     public static void main(String[] args) throws Exception {
         FMData dataset = getWineQualityDataset();
         List<FMData> partition = getRandomPartition(dataset, 0.6, new Random(1L));
         FMData train = partition.get(0);
         FMData test = partition.get(1);
-
+        
         double learnRate = 0.001;
         int numIter = 200;
         double sdev = 1.0;
@@ -57,18 +58,18 @@ public class WineQualityExample {
         double[] regM = new double[train.numFeatures()];
         Arrays.fill(regM, 0.01);
         int K = 10;
-
+        
         BoundedFM fm = new BoundedFM(3.0, 9.0, train.numInstances(), K, new Random(), sdev);
-
+        
         new PointWiseGradientDescent(learnRate, numIter, rmse(), regB, regW, regM)
                 .learn(fm, train, test);
     }
-
+    
     private static FMData getWineQualityDataset() throws IOException {
         int columns = 11;
-
+        
         SimpleFMData data = new SimpleFMData(columns);
-
+        
         String filePath = "winequality-white.csv";
         if (!new File(filePath).exists()) {
             URL url = new URL("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv");
@@ -76,9 +77,9 @@ public class WineQualityExample {
             FileOutputStream fos = new FileOutputStream(filePath);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
         }
-
+        
         InputStream is = new FileInputStream(filePath);
-
+        
         try (BufferedReader in = new BufferedReader(new InputStreamReader(is))) {
             in.readLine();
             String instance;
@@ -93,7 +94,7 @@ public class WineQualityExample {
                 data.add(new FMInstance(target, k, v));
             }
         }
-
+        
         for (int _col = 0; _col < columns; _col++) {
             int col = _col;
             
@@ -102,24 +103,32 @@ public class WineQualityExample {
                     .summaryStatistics();
             double max = stats.getMax();
             double min = stats.getMin();
-
+            
             if (max == min) {
                 data.stream().forEach(x -> x.set(col, 0.0));
             } else {
                 data.stream().forEach(x -> x.set(col, (x.get(col) - min) / (max - min)));
             }
         }
-
+        
         return data;
     }
-
+    
     private static List<FMData> getRandomPartition(FMData dataset, double trainProp, Random rnd) {
-        Map<Boolean, List<FMInstance>> partition = dataset.stream()
-                .collect(groupingBy((FMInstance instance) -> rnd.nextDouble() < trainProp));
-        FMData train = new SimpleFMData(dataset.numFeatures(), new Random(), partition.get(true));
-        FMData test = new SimpleFMData(dataset.numFeatures(), new Random(), partition.get(false));
-
+        List<FMInstance> trainList = new ArrayList<>();
+        List<FMInstance> testList = new ArrayList<>();
+        dataset.shuffle();
+        dataset.stream().forEach(instance -> {
+            if (rnd.nextDouble() < trainProp) {
+                trainList.add(instance);
+            } else {
+                testList.add(instance);
+            }
+        });
+        FMData train = new SimpleFMData(dataset.numFeatures(), rnd, trainList);
+        FMData test = new SimpleFMData(dataset.numFeatures(), rnd, testList);
+        
         return Arrays.asList(train, test);
     }
-
+    
 }
