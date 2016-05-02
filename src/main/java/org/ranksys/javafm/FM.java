@@ -62,7 +62,7 @@ public class FM {
      * @param x instance
      * @return value of prediction
      */
-    public double prediction(FMInstance x) {
+    public double predict(FMInstance x) {
         double pred = b;
 
         double[] xm = new double[m[0].length];
@@ -77,20 +77,6 @@ public class FM {
         pred += 0.5 * dotProduct(xm, xm);
 
         return pred;
-    }
-
-    /**
-     * Feature-specific contribution to the prediction of the value of an instance.
-     *
-     * @param x instance
-     * @param i index of the feature of interest
-     * @param xi value of the feature of interest
-     * @return value of the contribution of the feature to the prediction
-     */
-    public double prediction(FMInstance x, int i, double xi) {
-        return 0.0
-                + xi * w[i]
-                + x.operate((j, xj) -> xi * xj * dotProduct(m[i], m[j]), SUM);
     }
 
     /**

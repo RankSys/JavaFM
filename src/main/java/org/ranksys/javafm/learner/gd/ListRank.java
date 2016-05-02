@@ -14,15 +14,15 @@ import java.util.logging.Logger;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import org.ranksys.javafm.FM;
-import org.ranksys.javafm.data.GroupFMData;
 import org.ranksys.javafm.FMInstance;
 import org.ranksys.javafm.learner.FMLearner;
+import org.ranksys.javafm.data.ListWiseFMData;
 
 /**
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
-public class ListRank implements FMLearner<GroupFMData> {
+public class ListRank implements FMLearner<ListWiseFMData> {
 
     private static final Logger LOG = Logger.getLogger(ListRank.class.getName());
 
@@ -56,7 +56,7 @@ public class ListRank implements FMLearner<GroupFMData> {
 
     private double[] getQ(FM fm, List<? extends FMInstance> group) {
         double[] q = group.stream()
-                .mapToDouble(fm::prediction)
+                .mapToDouble(fm::predict)
                 .map(Math::exp)
                 .toArray();
 
@@ -69,7 +69,7 @@ public class ListRank implements FMLearner<GroupFMData> {
     }
 
     @Override
-    public double error(FM fm, GroupFMData test) {
+    public double error(FM fm, ListWiseFMData test) {
         return test.streamByGroup().map(Entry::getValue)
                 .mapToDouble((List<? extends FMInstance> group) -> {
                     double[] p = getP(group);
@@ -83,7 +83,7 @@ public class ListRank implements FMLearner<GroupFMData> {
     }
 
     @Override
-    public void learn(FM fm, GroupFMData train, GroupFMData test) {
+    public void learn(FM fm, ListWiseFMData train, ListWiseFMData test) {
         LOG.fine(() -> String.format("iteration n = %3d e = %.6f e = %.6f", 0, error(fm, train), error(fm, test)));
 
         for (int t = 1; t <= numIter; t++) {

@@ -19,19 +19,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import org.ranksys.javafm.data.ListFMData;
-import org.ranksys.javafm.data.FMData;
+import org.ranksys.javafm.data.SimpleFMData;
 import org.ranksys.javafm.FMInstance;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import org.ranksys.javafm.learner.gd.PointWiseGradientDescent;
 import java.util.DoubleSummaryStatistics;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.IntStream.range;
 import java.util.stream.Stream;
 import org.ranksys.javafm.BoundedFM;
 import static org.ranksys.javafm.learner.gd.PointWiseError.rmse;
+import org.ranksys.javafm.data.FMData;
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Regression example with the Wine Quality dataset.<br>
@@ -67,7 +67,7 @@ public class WineQualityExample {
     private static FMData getWineQualityDataset() throws IOException {
         int columns = 11;
 
-        ListFMData data = new ListFMData(columns);
+        SimpleFMData data = new SimpleFMData(columns);
 
         String filePath = "winequality-white.csv";
         if (!new File(filePath).exists()) {
@@ -116,8 +116,8 @@ public class WineQualityExample {
     private static List<FMData> getRandomPartition(FMData dataset, double trainProp, Random rnd) {
         Map<Boolean, List<FMInstance>> partition = dataset.stream()
                 .collect(groupingBy(instance -> rnd.nextDouble() < trainProp));
-        FMData train = new ListFMData(dataset.numFeatures(), new Random(), partition.get(true));
-        FMData test = new ListFMData(dataset.numFeatures(), new Random(), partition.get(false));
+        FMData train = new SimpleFMData(dataset.numFeatures(), new Random(), partition.get(true));
+        FMData test = new SimpleFMData(dataset.numFeatures(), new Random(), partition.get(false));
 
         return Arrays.asList(train, test);
     }

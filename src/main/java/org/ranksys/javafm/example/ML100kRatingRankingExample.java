@@ -10,7 +10,7 @@ package org.ranksys.javafm.example;
 import java.util.Arrays;
 import java.util.Random;
 import org.ranksys.javafm.FM;
-import org.ranksys.javafm.data.GroupFMData;
+import org.ranksys.javafm.data.SimpleListWiseFMData;
 import static org.ranksys.javafm.example.ML100kRatingPredictionExample.getRecommendationDataset;
 import org.ranksys.javafm.learner.gd.ListRank;
 
@@ -24,8 +24,8 @@ import org.ranksys.javafm.learner.gd.ListRank;
 public class ML100kRatingRankingExample {
 
     public static void main(String[] args) throws Exception {
-        GroupFMData train = getRecommendationDataset("u1.base");
-        GroupFMData test = getRecommendationDataset("u1.test");
+        SimpleListWiseFMData train = getRecommendationDataset("u1.base");
+        SimpleListWiseFMData test = getRecommendationDataset("u1.test");
 
         double learnRate = 0.01;
         int numIter = 200;

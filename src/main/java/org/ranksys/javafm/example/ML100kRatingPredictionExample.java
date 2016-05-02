@@ -18,15 +18,15 @@ import static java.lang.Double.parseDouble;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.learner.gd.PointWiseGradientDescent;
 import org.ranksys.javafm.BoundedFM;
 import java.util.Arrays;
-import org.ranksys.javafm.data.GroupFMData;
-import static java.lang.Integer.parseInt;
+import org.ranksys.javafm.data.SimpleListWiseFMData;
 import java.util.Random;
 import org.ranksys.javafm.FMInstance;
 import static org.ranksys.javafm.learner.gd.PointWiseError.rmse;
+import org.ranksys.javafm.data.FMData;
+import static java.lang.Integer.parseInt;
 
 /**
  * Example with rating prediction (not real recommendation) with the MovieLens 100K dataset. Note that this type of rating prediction is of little use for generating useful recommendations. This is just a example of how JavaFM works.<br>
@@ -60,8 +60,8 @@ public class ML100kRatingPredictionExample {
                 .learn(fm, train, test);
     }
 
-    public static GroupFMData getRecommendationDataset(String file) throws IOException {
-        GroupFMData dataset = new GroupFMData(NUM_USERS + NUM_ITEMS);
+    public static SimpleListWiseFMData getRecommendationDataset(String file) throws IOException {
+        SimpleListWiseFMData dataset = new SimpleListWiseFMData(NUM_USERS + NUM_ITEMS);
 
         if (!new File(file).exists()) {
             URL url = new URL("http://files.grouplens.org/datasets/movielens/ml-100k/" + file);

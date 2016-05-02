@@ -7,11 +7,11 @@
  */
 package org.ranksys.javafm.learner.gd;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.signum;
 import java.util.function.DoubleBinaryOperator;
 import org.ranksys.javafm.FM;
 import org.ranksys.javafm.FMInstance;
+import static java.lang.Math.abs;
+import static java.lang.Math.signum;
 
 /**
  *
@@ -28,11 +28,11 @@ public class PointWiseError {
     }
 
     public double error(FM fm, FMInstance x) {
-        return error.applyAsDouble(fm.prediction(x), x.getTarget());
+        return error.applyAsDouble(fm.predict(x), x.getTarget());
     }
 
     public double dError(FM fm, FMInstance x) {
-        return dError.applyAsDouble(fm.prediction(x), x.getTarget());
+        return dError.applyAsDouble(fm.predict(x), x.getTarget());
     }
     
     public static PointWiseError rmse() {

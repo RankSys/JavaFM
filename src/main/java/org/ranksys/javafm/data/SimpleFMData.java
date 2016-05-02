@@ -19,7 +19,7 @@ import org.ranksys.javafm.FMInstance;
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
-public class ListFMData implements FMData {
+public class SimpleFMData implements FMData {
 
     private final List<FMInstance> list;
     private final int numFeatures;
@@ -31,7 +31,7 @@ public class ListFMData implements FMData {
      * @param numFeatures number of features
      * @param rnd random number generator
      */
-    public ListFMData(int numFeatures, Random rnd, List<FMInstance> instances) {
+    public SimpleFMData(int numFeatures, Random rnd, List<FMInstance> instances) {
         this.numFeatures = numFeatures;
         this.rnd = rnd;
         this.list = new ArrayList<>(instances);
@@ -42,7 +42,7 @@ public class ListFMData implements FMData {
      *
      * @param numFeatures number of features
      */
-    public ListFMData(int numFeatures) {
+    public SimpleFMData(int numFeatures) {
         this(numFeatures, new Random(), new ArrayList<>());
     }
     

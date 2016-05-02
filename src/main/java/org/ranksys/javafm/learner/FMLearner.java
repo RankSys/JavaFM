@@ -7,8 +7,8 @@
  */
 package org.ranksys.javafm.learner;
 
-import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.FM;
+import org.ranksys.javafm.data.FMData;
 
 /**
  * Learner of factorisation machines.

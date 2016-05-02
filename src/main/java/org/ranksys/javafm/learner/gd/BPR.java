@@ -7,13 +7,14 @@
  */
 package org.ranksys.javafm.learner.gd;
 
+import static java.lang.Double.NaN;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import java.util.logging.Logger;
 import org.ranksys.javafm.FM;
-import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.FMInstance;
 import org.ranksys.javafm.learner.FMLearner;
+import org.ranksys.javafm.data.FMData;
 
 /**
  *
@@ -35,7 +36,7 @@ public class BPR implements FMLearner<FMData> {
         this.regM = regM;
     }
 
-    private int[] uij(FMInstance x) {
+    private static int[] uij(FMInstance x) {
         int[] uij = new int[3];
         x.consume((i, xi) -> {
             uij[(int) xi - 1] = i;
@@ -44,17 +45,17 @@ public class BPR implements FMLearner<FMData> {
         return uij;
     }
 
+    private static double sij(FM fm, int[] uij) {
+        FMInstance xi = new FMInstance(NaN, new int[]{uij[0], uij[1]}, new double[]{1.0, 1.0});
+        FMInstance xj = new FMInstance(NaN, new int[]{uij[0], uij[2]}, new double[]{1.0, 1.0});
+
+        return fm.predict(xi) - fm.predict(xj);
+    }
+
     @Override
     public double error(FM fm, FMData test) {
         return test.stream()
-                .mapToDouble(x -> {
-                    int[] uij = uij(x);
-                    int i = uij[1];
-                    int j = uij[2];
-
-                    double sij = fm.prediction(x, i, 1.0) - fm.prediction(x, j, 1.0);
-                    return log(1 / (1 + exp(-sij)));
-                })
+                .mapToDouble(x -> log(1 / (1 + exp(-sij(fm, uij(x))))))
                 .average().getAsDouble();
     }
 
@@ -76,8 +77,7 @@ public class BPR implements FMLearner<FMData> {
                 int i = uij[1];
                 int j = uij[2];
 
-                double sij = fm.prediction(x, i, 1.0) - fm.prediction(x, j, 1.0);
-                double lambda = 1 / (1 + exp(sij));
+                double lambda = 1 / (1 + exp(sij(fm, uij)));
 
                 w[i] -= learnRate * (-lambda + regW[i] * w[i]);
                 w[j] -= learnRate * (+lambda + regW[j] * w[j]);

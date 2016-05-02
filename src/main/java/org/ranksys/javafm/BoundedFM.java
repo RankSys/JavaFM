@@ -7,9 +7,9 @@
  */
 package org.ranksys.javafm;
 
+import java.util.Random;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import java.util.Random;
 
 /**
  *
@@ -33,13 +33,8 @@ public class BoundedFM extends FM {
     }
 
     @Override
-    public double prediction(FMInstance x) {
-        return min(max, max(min, super.prediction(x)));
-    }
-
-    @Override
-    public double prediction(FMInstance x, int i, double xi) {
-        return min(max, max(min, super.prediction(x, i, xi)));
+    public double predict(FMInstance x) {
+        return min(max, max(min, super.predict(x)));
     }
 
 }

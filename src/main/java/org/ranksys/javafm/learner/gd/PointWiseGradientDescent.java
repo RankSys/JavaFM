@@ -8,9 +8,9 @@
 package org.ranksys.javafm.learner.gd;
 
 import java.util.logging.Logger;
-import org.ranksys.javafm.data.FMData;
 import org.ranksys.javafm.FM;
 import org.ranksys.javafm.learner.FMLearner;
+import org.ranksys.javafm.data.FMData;
 
 /**
  * Stochastic gradient descent learner.

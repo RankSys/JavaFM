@@ -26,7 +26,7 @@ import org.ranksys.javafm.FMInstance;
  *
  * @author Saúl Vargas (Saul@VargasSandoval.es)
  */
-public class GroupFMData implements FMData {
+public class SimpleListWiseFMData implements ListWiseFMData {
 
     private final IntList groupList = new IntArrayList();
     private final IntSet groupSet = new IntOpenHashSet();
@@ -40,7 +40,7 @@ public class GroupFMData implements FMData {
      * @param numFeatures number of features
      * @param rnd random number generator
      */
-    public GroupFMData(int numFeatures, Random rnd) {
+    public SimpleListWiseFMData(int numFeatures, Random rnd) {
         this.numFeatures = numFeatures;
         this.rnd = rnd;
     }
@@ -50,7 +50,7 @@ public class GroupFMData implements FMData {
      *
      * @param numFeatures number of features
      */
-    public GroupFMData(int numFeatures) {
+    public SimpleListWiseFMData(int numFeatures) {
         this(numFeatures, new Random());
     }
 
@@ -82,6 +82,7 @@ public class GroupFMData implements FMData {
                 .flatMap(i -> map.get(i).stream());
     }
 
+    @Override
     public Stream<Entry<List<? extends FMInstance>>> streamByGroup() {
         return groupList.stream()
                 .map(i -> new AbstractInt2ObjectMap.BasicEntry<>(i, map.get(i)));
