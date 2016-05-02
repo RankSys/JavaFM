@@ -31,6 +31,9 @@ public interface FMData {
      */
     public int numFeatures();
     
+    /**
+     * Shuffle the data, so that stream() results the instances in different order.
+     */
     public void shuffle();
     
     /**
