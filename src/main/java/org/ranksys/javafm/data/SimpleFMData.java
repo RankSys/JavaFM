@@ -30,6 +30,7 @@ public class SimpleFMData implements FMData {
      *
      * @param numFeatures number of features
      * @param rnd random number generator
+     * @param instances list of instances that compose the data
      */
     public SimpleFMData(int numFeatures, Random rnd, List<FMInstance> instances) {
         this.numFeatures = numFeatures;
