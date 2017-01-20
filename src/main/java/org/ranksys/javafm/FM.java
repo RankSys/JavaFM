@@ -19,6 +19,7 @@ public class FM {
 
     private static final DoubleBinaryOperator SUM = (x, y) -> x + y;
 
+    private final int K;
     private double b;
     private final double[] w;
     private final double[][] m;
@@ -31,12 +32,15 @@ public class FM {
      * @param m initial feature interaction matrix
      */
     public FM(double b, double[] w, double[][] m) {
+        // TODO: this line below could be dangerous
+        this.K = m[0].length;
         this.b = b;
         this.w = w;
         this.m = m;
     }
 
     public FM(int numFeatures, int K, Random rnd, double sdev) {
+        this.K = K;
         this.b = 0.0;
         this.w = new double[numFeatures];
         this.m = new double[numFeatures][K];
@@ -77,6 +81,10 @@ public class FM {
         pred += 0.5 * dotProduct(xm, xm);
 
         return pred;
+    }
+
+    public int getK() {
+        return K;
     }
 
     /**
