@@ -7,15 +7,20 @@
  */
 package org.ranksys.javafm.example;
 
-import java.util.Arrays;
-import java.util.Random;
 import org.ranksys.javafm.FM;
 import org.ranksys.javafm.data.SimpleListWiseFMData;
-import static org.ranksys.javafm.example.ML100kRatingPredictionExample.getRecommendationDataset;
 import org.ranksys.javafm.learner.gd.ListRank;
 
+import java.util.Arrays;
+import java.util.Random;
+
+import static org.ranksys.javafm.example.ML100kRatingPredictionExample.getRecommendationDataset;
+
 /**
- * Example with rating prediction (not real recommendation) with the MovieLens 100K dataset. Note that this type of rating prediction is of little use for generating useful recommendations. This is just a example of how JavaFM works.<br>
+ * Example with rating prediction (not real recommendation) with the MovieLens
+ * 100K dataset. Note that this type of rating prediction is of little use for
+ * generating real-world recommendations. This is just a example of how JavaFM
+ * works.<br>
  *
  * http://files.grouplens.org/datasets/movielens/ml-100k-README.txt
  *

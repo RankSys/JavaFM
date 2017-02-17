@@ -8,15 +8,17 @@
 package org.ranksys.javafm.learner.gd;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap.Entry;
-import static java.lang.Math.log;
+import org.ranksys.javafm.FM;
+import org.ranksys.javafm.FMInstance;
+import org.ranksys.javafm.data.ListWiseFMData;
+import org.ranksys.javafm.learner.FMLearner;
+
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
-import org.ranksys.javafm.FM;
-import org.ranksys.javafm.FMInstance;
-import org.ranksys.javafm.learner.FMLearner;
-import org.ranksys.javafm.data.ListWiseFMData;
+
+import static java.lang.Math.log;
 
 /**
  *
@@ -92,7 +94,7 @@ public class ListRank implements FMLearner<ListWiseFMData> {
             train.shuffle();
 
             train.streamByGroup().map(Entry::getValue).forEach(group -> {
-                double b = fm.getB();
+                double[] b = fm.getB();
                 double[] w = fm.getW();
                 double[][] m = fm.getM();
 
@@ -104,7 +106,7 @@ public class ListRank implements FMLearner<ListWiseFMData> {
 
                     double lambda = -p[k] + q[k];
 
-                    fm.setB(b - learnRate * (lambda + regB * b));
+                    b[0] -= learnRate * (lambda + regB * b[0]);
 
                     double[] xm = new double[m[0].length];
                     x.consume((i, xi) -> {

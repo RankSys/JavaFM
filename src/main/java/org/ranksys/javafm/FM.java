@@ -7,6 +7,7 @@
  */
 package org.ranksys.javafm;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.function.DoubleBinaryOperator;
 
@@ -19,7 +20,7 @@ public class FM {
 
     private static final DoubleBinaryOperator SUM = (x, y) -> x + y;
 
-    private double b;
+    private final double[] b;
     private final double[] w;
     private final double[][] m;
 
@@ -31,13 +32,13 @@ public class FM {
      * @param m initial feature interaction matrix
      */
     public FM(double b, double[] w, double[][] m) {
-        this.b = b;
+        this.b = new double[]{b};
         this.w = w;
         this.m = m;
     }
 
     public FM(int numFeatures, int K, Random rnd, double sdev) {
-        this.b = 0.0;
+        this.b = new double[]{0.0};
         this.w = new double[numFeatures];
         this.m = new double[numFeatures][K];
         for (double[] mi : m) {
@@ -63,7 +64,7 @@ public class FM {
      * @return value of prediction
      */
     public double predict(FMInstance x) {
-        double pred = b;
+        double pred = b[0];
 
         double[] xm = new double[m[0].length];
         pred += x.operate((i, xi) -> {
@@ -84,18 +85,18 @@ public class FM {
      *
      * @return bias
      */
-    public double getB() {
+    public double[] getB() {
         return b;
     }
 
-    /**
-     * Set bias.
-     *
-     * @param b bias
-     */
-    public void setB(double b) {
-        this.b = b;
-    }
+//    /**
+//     * Set bias.
+//     *
+//     * @param b bias
+//     */
+//    public void setB(double b) {
+//        this.b = b;
+//    }
 
     /**
      * Get feature weight vector.
@@ -113,5 +114,15 @@ public class FM {
      */
     public double[][] getM() {
         return m;
+    }
+
+    public FM copy() {
+        double[] copyW = Arrays.copyOf(w, w.length);
+        double[][] copyM = new double[m.length][];
+        for (int i = 0; i < m.length; i++) {
+            copyM[i] = Arrays.copyOf(m[i], m[i].length);
+        }
+
+        return new FM(b[0], copyW, copyM);
     }
 }

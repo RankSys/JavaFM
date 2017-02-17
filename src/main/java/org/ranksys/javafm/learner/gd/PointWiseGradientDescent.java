@@ -7,10 +7,11 @@
  */
 package org.ranksys.javafm.learner.gd;
 
-import java.util.logging.Logger;
 import org.ranksys.javafm.FM;
-import org.ranksys.javafm.learner.FMLearner;
 import org.ranksys.javafm.data.FMData;
+import org.ranksys.javafm.learner.FMLearner;
+
+import java.util.logging.Logger;
 
 /**
  * Stochastic gradient descent learner.
@@ -46,7 +47,7 @@ public class PointWiseGradientDescent implements FMLearner<FMData> {
 
     @Override
     public void learn(FM fm, FMData train, FMData test) {
-        LOG.fine(() -> String.format("iteration n = %3d e = %.6f e = %.6f", 0, error(fm, train), error(fm, test)));
+        LOG.info(() -> String.format("iteration n = %3d e = %.6f e = %.6f", 0, error(fm, train), error(fm, test)));
 
         for (int t = 1; t <= numIter; t++) {
             long time0 = System.nanoTime();
@@ -54,13 +55,13 @@ public class PointWiseGradientDescent implements FMLearner<FMData> {
             train.shuffle();
 
             train.stream().forEach(x -> {
-                double b = fm.getB();
+                double[] b = fm.getB();
                 double[] w = fm.getW();
                 double[][] m = fm.getM();
 
                 double lambda = error.dError(fm, x);
 
-                fm.setB(b - learnRate * (lambda + regB * b));
+                b[0] -= learnRate * (lambda + regB * b[0]);
 
                 double[] xm = new double[m[0].length];
                 x.consume((i, xi) -> {
@@ -84,7 +85,7 @@ public class PointWiseGradientDescent implements FMLearner<FMData> {
             long time1 = System.nanoTime() - time0;
 
             LOG.info(String.format("iteration n = %3d t = %.2fs", iter, time1 / 1_000_000_000.0));
-            LOG.fine(() -> String.format("iteration n = %3d e = %.6f e = %.6f", iter, error(fm, train), error(fm, test)));
+            LOG.info(() -> String.format("iteration n = %3d e = %.6f e = %.6f", iter, error(fm, train), error(fm, test)));
         }
 
     }

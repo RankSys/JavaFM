@@ -7,6 +7,7 @@
  */
 package org.ranksys.javafm;
 
+import java.util.Arrays;
 import java.util.Random;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -37,4 +38,14 @@ public class BoundedFM extends FM {
         return min(max, max(min, super.predict(x)));
     }
 
+    @Override
+    public FM copy() {
+        double[] copyW = Arrays.copyOf(getW(), getW().length);
+        double[][] copyM = new double[getM().length][];
+        for (int i = 0; i < getM().length; i++) {
+            copyM[i] = Arrays.copyOf(getM()[i], getM()[i].length);
+        }
+
+        return new BoundedFM(getB()[0], copyW, copyM, min, max);
+    }
 }
